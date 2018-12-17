@@ -13,9 +13,7 @@ class Marbles
         # puts "board: #{board.join(" ")}"
         marble += 1
         if marble % 23 == 0
-          7.times do
-            current_marble = current_marble[:counter_clockwise]
-          end
+          current_marble = current_marble.counter_clockwise.counter_clockwise.counter_clockwise.counter_clockwise.counter_clockwise.counter_clockwise.counter_clockwise
 
           # since we're about to orphan it
           old_marble = current_marble
