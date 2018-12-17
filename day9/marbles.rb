@@ -2,7 +2,6 @@ class Marbles
   Marble = Struct.new(:value, :counter_clockwise, :clockwise)
   def self.emitter
     marble_madness = Enumerator.new do |y|
-      board = [0]
       marble = 0
       current_marble = Marble.new(0)
       current_marble[:clockwise] = current_marble
@@ -10,7 +9,6 @@ class Marbles
       current_marble[:value] = 0
 
       loop do
-        # puts "board: #{board.join(" ")}"
         marble += 1
         if marble % 23 == 0
           current_marble = current_marble.counter_clockwise.counter_clockwise.counter_clockwise.counter_clockwise.counter_clockwise.counter_clockwise.counter_clockwise
@@ -44,16 +42,6 @@ class Marbles
           y << 0
         end
       end
-    end
-  end
-
-  def self.wrapped_index(board_size, current_index, shift)
-    if shift + current_index >= board_size
-      shift + current_index - board_size
-    elsif shift + current_index < 0
-      shift + current_index + board_size
-    else
-      current_index + shift
     end
   end
 
