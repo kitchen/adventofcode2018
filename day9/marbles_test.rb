@@ -24,6 +24,6 @@ class MarblesPlayerTest < Minitest::Test
     assert_equal(54718, MarblesPlayer.new(21).play(6111).values.max)
     assert_equal(2764, MarblesPlayer.new(17).play(1104).values.max)
     assert_equal(375414, MarblesPlayer.new(459).play(71320).values.max)
-    # assert_equal(3168033673, MarblesPlayer.new(459).play(7132000).values.max)
+    assert_equal(3168033673, MarblesPlayer.new(459).play(7132000).values.max)
   end
 end

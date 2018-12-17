@@ -40,6 +40,7 @@ class Marbles
           new_marble.counter_clockwise.clockwise = new_marble
           new_marble.clockwise.counter_clockwise = new_marble
           current_marble = new_marble
+
           y << 0
         end
       end
