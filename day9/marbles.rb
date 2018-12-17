@@ -1,39 +1,50 @@
-require 'ostruct'
-
 class Marbles
   def self.emitter
     marble_madness = Enumerator.new do |y|
       board = [0]
       marble = 0
-      current_marble = OpenStruct.new
-      current_marble.clockwise = current_marble
-      current_marble.counter_clockwise = current_marble
-      current_marble.value = 0
+      current_marble = {}
+      current_marble[:clockwise] = current_marble
+      current_marble[:counter_clockwise] = current_marble
+      current_marble[:value] = 0
 
       loop do
         # puts "board: #{board.join(" ")}"
         marble += 1
         if marble % 23 == 0
           7.times do
-            current_marble = current_marble.counter_clockwise
+            current_marble = current_marble[:counter_clockwise]
           end
-          counter_clockwise = current_marble.counter_clockwise
-          clockwise = current_marble.clockwise
 
-          counter_clockwise.clockwise = clockwise
-          clockwise.counter_clockwise = counter_clockwise
+          # since we're about to orphan it
+          old_marble = current_marble
+          # figure out the neighbers
+          counter_clockwise = current_marble[:counter_clockwise]
+          clockwise = current_marble[:clockwise]
 
-          y << marble + current_marble.value
+          # point them at each other
+          counter_clockwise[:clockwise] = clockwise
+          clockwise[:counter_clockwise] = counter_clockwise
+
+          # orphan it
+          current_marble[:clockwise] = nil
+          current_marble[:counter_clockwise] = nil
+
+          # set the current_marble to the one clockwise from what we removed
+          current_marble = clockwise
+
+          # return a score
+          y << marble + old_marble[:value]
         else
-          one_marble = current_marble.clockwise
-          two_marble = one_marble.clockwise
+          one_marble = current_marble[:clockwise]
+          two_marble = one_marble[:clockwise]
 
-          current_marble = OpenStruct.new
-          current_marble.counter_clockwise = one_marble
-          one_marble.clockwise = current_marble
-          current_marble.clockwise = two_marble
-          two_marble.counter_clockwise = current_marble
-          current_marble.value = marble
+          current_marble = {}
+          current_marble[:counter_clockwise] = one_marble
+          one_marble[:clockwise] = current_marble
+          current_marble[:clockwise] = two_marble
+          two_marble[:counter_clockwise] = current_marble
+          current_marble[:value] = marble
           y << 0
         end
       end
