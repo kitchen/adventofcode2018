@@ -15,20 +15,13 @@ class Marbles
 
           # since we're about to orphan it
           old_marble = current_marble
-          # figure out the neighbers
-          counter_clockwise = current_marble[:counter_clockwise]
-          clockwise = current_marble[:clockwise]
-
-          # point them at each other
-          counter_clockwise[:clockwise] = clockwise
-          clockwise[:counter_clockwise] = counter_clockwise
+          current_marble = old_marble.clockwise
+          old_marble.counter_clockwise.clockwise = old_marble.clockwise
+          old_marble.clockwise.counter_clockwise = old_marble.counter_clockwise
 
           # orphan it
-          current_marble[:clockwise] = nil
-          current_marble[:counter_clockwise] = nil
-
-          # set the current_marble to the one clockwise from what we removed
-          current_marble = clockwise
+          old_marble[:clockwise] = nil
+          old_marble[:counter_clockwise] = nil
 
           # return a score
           y << marble + old_marble[:value]
