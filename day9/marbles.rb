@@ -1,9 +1,10 @@
 class Marbles
+  Marble = Struct.new(:value, :counter_clockwise, :clockwise)
   def self.emitter
     marble_madness = Enumerator.new do |y|
       board = [0]
       marble = 0
-      current_marble = {}
+      current_marble = Marble.new(0)
       current_marble[:clockwise] = current_marble
       current_marble[:counter_clockwise] = current_marble
       current_marble[:value] = 0
@@ -39,12 +40,9 @@ class Marbles
           one_marble = current_marble[:clockwise]
           two_marble = one_marble[:clockwise]
 
-          current_marble = {}
-          current_marble[:counter_clockwise] = one_marble
+          current_marble = Marble.new(marble, one_marble, two_marble)
           one_marble[:clockwise] = current_marble
-          current_marble[:clockwise] = two_marble
           two_marble[:counter_clockwise] = current_marble
-          current_marble[:value] = marble
           y << 0
         end
       end
