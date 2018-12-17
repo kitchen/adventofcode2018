@@ -12,13 +12,6 @@ class MarblesTest < Minitest::Test
     assert_equal([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,32], @emitter.take(23))
   end
 
-  def test_wrapped_index
-    assert_equal(1, Marbles.wrapped_index([0], 0, 2))
-
-    dummy_board = (1..23).to_a
-    assert_equal(17, Marbles.wrapped_index(dummy_board, 2, -7))
-    assert_equal(0, Marbles.wrapped_index(dummy_board, 22, 2))
-  end
 end
 
 class MarblesPlayerTest < Minitest::Test

@@ -1,26 +1,39 @@
+require 'ostruct'
+
 class Marbles
   def self.emitter
     marble_madness = Enumerator.new do |y|
       board = [0]
       marble = 0
-      current_marble = 0
-      current_index = 0
+      current_marble = OpenStruct.new
+      current_marble.clockwise = current_marble
+      current_marble.counter_clockwise = current_marble
+      current_marble.value = 0
 
       loop do
         # puts "board: #{board.join(" ")}"
         marble += 1
         if marble % 23 == 0
-          delete_index = wrapped_index(board.size, current_index, -7)
-          score = board[delete_index] + marble
-          board.delete_at(delete_index)
-          current_marble = board[delete_index]
-          current_index = delete_index
-          y << score
+          7.times do
+            current_marble = current_marble.counter_clockwise
+          end
+          counter_clockwise = current_marble.counter_clockwise
+          clockwise = current_marble.clockwise
+
+          counter_clockwise.clockwise = clockwise
+          clockwise.counter_clockwise = counter_clockwise
+
+          y << marble + current_marble.value
         else
-          insert_index = wrapped_index(board.size, current_index, 2)
-          board.insert(insert_index, marble)
-          current_marble = marble
-          current_index = insert_index
+          one_marble = current_marble.clockwise
+          two_marble = one_marble.clockwise
+
+          current_marble = OpenStruct.new
+          current_marble.counter_clockwise = one_marble
+          one_marble.clockwise = current_marble
+          current_marble.clockwise = two_marble
+          two_marble.counter_clockwise = current_marble
+          current_marble.value = marble
           y << 0
         end
       end
