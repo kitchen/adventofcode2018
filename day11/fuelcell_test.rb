@@ -12,6 +12,11 @@ class FuelCellGridTest < Minitest::Test
   end
 
   def test_best_power_square
-    assert_equal([[21,61], 30], FuelCellGrid.new(42).find_most_powerful)
+    assert_equal([[21,61], 30, 3], FuelCellGrid.new(42).find_most_powerful)
+  end
+
+  def test_best_power_square_with_size
+    assert_equal([[90,269],113,16], FuelCellGrid.new(18).find_most_powerful_size, "18")
+    assert_equal([[232,251],119,12], FuelCellGrid.new(42).find_most_powerful_size, "42")
   end
 end
