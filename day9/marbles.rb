@@ -35,12 +35,11 @@ class Marbles
           # return a score
           y << marble + old_marble[:value]
         else
-          one_marble = current_marble[:clockwise]
-          two_marble = one_marble[:clockwise]
+          new_marble = Marble.new(marble, current_marble.clockwise, current_marble.clockwise.clockwise)
 
-          current_marble = Marble.new(marble, one_marble, two_marble)
-          one_marble[:clockwise] = current_marble
-          two_marble[:counter_clockwise] = current_marble
+          new_marble.counter_clockwise.clockwise = new_marble
+          new_marble.clockwise.counter_clockwise = new_marble
+          current_marble = new_marble
           y << 0
         end
       end
