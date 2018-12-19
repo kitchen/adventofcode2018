@@ -10,3 +10,4 @@ git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 gem 'pry'
 gem 'dag'
 gem 'pry-doc'
+gem 'pry-byebug'
