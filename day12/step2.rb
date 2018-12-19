@@ -1,6 +1,6 @@
 require './pots'
 
-rules = File.readlines('input.txt')
+rules = File.readlines(ARGV[0])
 
 initial_state = rules.shift.chomp.sub('initial state: ', '')
 rules.shift
