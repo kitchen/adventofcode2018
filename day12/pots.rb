@@ -1,63 +1,89 @@
+require 'set'
 class Pots
   include Enumerable
 
   attr_accessor :pots
-  def initialize(initial_state = '')
-    @pots = Hash.new {|h,k| h[k] = '.'}
-    @pots = Hash[initial_state.chars.map.with_index {|state, index| [index, state]}]
+  attr_accessor :patterns
+  attr_accessor :generation
+
+  def initialize(initial_state = '', rules = [])
+    @pots = Set.new
+    initial_state.chars.each_with_index do |state, index|
+      if state == '#'
+        @pots << index
+      end
+    end
+
+    @patterns = Set.new
+    rules.each do |rule|
+      (pattern, new_state) = parse_pattern(rule)
+      if new_state == '#'
+        patterns << pattern
+      end
+    end
+    @generation = 0
   end
-  
+
   def [](number)
-    return @pots[number] if pots.key?(number)
+    return '#' if @pots.include?(number)
     '.'
   end
-  
+
   def []=(number, state)
-    @pots[number] = state
+    if state == '#'
+      @pots << number
+    else
+      @pots.delete(number)
+    end
   end
-  
+
   def each(&blk)
     # this allows for gaps in the key
-    ((pots.keys.min)..(pots.keys.max)).each do |number|
+    ((pots.min)..(pots.max)).each do |number|
       yield [number, self[number]]
     end
   end
-  
+
   def around(number)
-    ((number-2)..(number+2)).map {|number| self[number]}.join('')
-  end
-  
-  STATE_OPPOSITES = {
-    '.' => '#',
-    '#' => '.'
-  }.freeze
-  
-  def opposite_of(state)
-    STATE_OPPOSITES[state]
+    [self[number-2], self[number-1], self[number], self[number+1], self[number+2]].join('')
   end
 
-  def grow!(pattern, new_state)
-    changes = {}
-    ((pots.keys.min - 2)..(pots.keys.max + 2)).each do |number|
-      if around(number) == pattern
-        changes[number] = new_state
+  def grow!
+    deletes = []
+    adds = []
+    smallest = pots.min
+    biggest = pots.max
+
+    # skip any patterns that aren't going to change the state anyways
+    # hell. only test patterns that are going to make it one way or the other and assume the other otherwise
+    # instead of comparing all the things, search each thing
+    # break patterns into a tree
+    # ..#.# => .
+    # patterns['.']['.']['#']['.']['#'] = .
+    # then when faced with, say... yes.
+    ((smallest - 2)..(biggest + 2)).each do |number|
+      if @patterns.include?(around(number))
+        unless @pots.include?(number)
+          adds << number
+        end
       else
-        changes[number] = opposite_of(new_state)
+        if @pots.include?(number)
+          deletes << number
+        end
       end
     end
-    
-    @pots.merge!(changes)
+
+    # puts "#{generation}: smallest: #{smallest} #{pots.to_h.values.join('')}"
+    @generation += 1
+    @pots += adds
+    @pots -= deletes
+    @pots
   end
-  
+
   def parse_pattern(raw_pattern)
     (_, pattern, new_state) = raw_pattern.match(/^(.{5})\s+=>\s+(.)/).to_a
-    
+
     [pattern, new_state]
   end
-  
-  def grow_string!(raw_pattern)
-    (pattern, new_state) = parse_pattern(raw_pattern)
-    puts "pattern: #{pattern}"
-    grow!(pattern, new_state)
-  end
+
 end
