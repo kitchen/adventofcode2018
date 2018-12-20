@@ -82,7 +82,6 @@ class PotsTest < Minitest::Test
       pots.grow!
       assert_equal(generation, pots.generation)
       assert_equal(plants, (-3..35).map {|i| pots[i]}.join(''), "generation #{generation}")
-      refute_equal(20, pots.pots.size)
     end
   end
 end
