@@ -14,6 +14,9 @@ GEM
     pry-doc (0.13.5)
       pry (~> 0.11)
       yard (~> 0.9.11)
+    term-ansicolor (1.7.0)
+      tins (~> 1.0)
+    tins (1.20.2)
     yard (0.9.16)
 
 PLATFORMS
@@ -24,6 +27,7 @@ DEPENDENCIES
   pry
   pry-byebug
   pry-doc
+  term-ansicolor
 
 BUNDLED WITH
    1.17.2
