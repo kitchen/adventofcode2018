@@ -3,10 +3,11 @@ class Cooker
   Elf = Struct.new(:current_recipe)
 
   ELF_TEMPLATES = %W{
-    "%(score)"
-    '%(score)'
-    [%(score)]
-    {%(score)}
+    (%s)
+    [%s]
+    "%s"
+    '%s'
+    {%s}
   }
   def self.generator(starting_scoreboard, number_of_elves = 2)
     score0 = Recipe.new(starting_scoreboard.shift)
@@ -16,19 +17,28 @@ class Cooker
     end
 
     elves = number_of_elves.times.map {|i| Elf.new(scoreboard[i])}
+    # puts render_scoreboard(scoreboard, elves)
+
     Enumerator.new do |y|
-      new_score = elves.sum {|elf| elf.current_recipe.score}
       loop do
+        new_score = elves.sum {|elf| elf.current_recipe.score}
         new_score.digits.reverse.each do |digit|
           add_to_scoreboard(scoreboard, digit)
           y << digit
         end
 
-        new_score.times do
-          elves.each do |elf|
+        # puts "ran out of digits, elves need to move and work more!"
+        # puts render_scoreboard(scoreboard, elves)
+
+        elves.each do |elf|
+          # puts "elf is moving #{elf.current_recipe.score + 1} times"
+          (elf.current_recipe.score + 1).times do
             elf.current_recipe = elf.current_recipe.right
           end
         end
+        # puts "elves have moved!"
+        # puts render_scoreboard(scoreboard, elves)
+
       end
     end
   end
@@ -42,7 +52,37 @@ class Cooker
     scoreboard << new_score
   end
 
-  def self.draw_scoreboard
+  def self.render_scoreboard(scoreboard, elves)
+    scoreboard.map do |recipe|
+      elf = elves.find {|elf| elf.current_recipe == recipe}
+      if elf
+        template = ELF_TEMPLATES[elves.index(elf)]
+      else
+        template = ' %s '
+      end
+      template % (recipe.score)
+    end.join('')
+  end
+  
+  def self.next_ten(start, elves, from)
+    self.generator(start, elves).take(from + 10 - start.size - 1).slice(-10, 10).map(&:to_s).join('')
+  end
+  
+  def self.first_appears(pattern)
+    pattern = pattern.chars.map(&:to_i)
+    pattern_size = pattern.size
+    scoreboard = [3,7]
+    sequence_generator = generator(scoreboard)
+    recipes = 2
+
+    until pattern == scoreboard
+      scoreboard << sequence_generator.next
+      recipes += 1
+      if scoreboard.size > pattern_size
+        scoreboard.shift
+      end
+    end
     
+    recipes - pattern_size
   end
 end
