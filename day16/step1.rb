@@ -10,7 +10,7 @@ until lines.empty?
   instruction = lines.shift.chomp
   after = lines.shift.gsub(/[^\s\d]/, '').strip
   lines.shift
-  
+
   instructions = Registers.find_matching_instructions(before, instruction, after)
   three_or_more += 1 if instructions.count >= 3
 end
