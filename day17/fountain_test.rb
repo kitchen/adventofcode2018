@@ -30,20 +30,13 @@ class FountainTest < Minitest::Test
     assert(true, "it worked")
   end
 
-  def test_pry
-# skip
-    fountain = Fountain.new(TEST_SCAN)
-    require 'pry'
-    binding.pry
-
-    assert(false)
-  end
-
   def test_flow
     fountain = Fountain.new(TEST_SCAN)
     fountain.flow!
     assert_equal(57, fountain.water_reached)
     fountain.dump_png
+    assert_equal(29, fountan.standing_water)
+    assert_equal(57, fountain.water_reached)
     assert(true, "it worked")
   end
 

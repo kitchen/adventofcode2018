@@ -3,6 +3,7 @@ require 'chunky_png'
 class Fountain
   attr_accessor :grid
   attr_accessor :min_x
+  attr_accessor :min_y
   attr_accessor :max_x
   attr_accessor :max_y
 
@@ -27,6 +28,8 @@ class Fountain
           @min_x = x
         elsif !@max_x || x > @max_x
           @max_x = x
+        elsif !@min_y || y < @min_y
+          @min_y = y
         elsif !@max_y || y > @max_y
           @max_y = y
         end
@@ -66,7 +69,7 @@ class Fountain
   end
 
   def to_s
-    (0..max_y).map do |y|
+    (-1..max_y).map do |y|
       (min_x..max_x).map do |x|
         grid[y][x] || '.'
       end.join("")
@@ -81,9 +84,9 @@ class Fountain
     height = max_y + 20
 
     img = ChunkyPNG::Image.new(width, height, ChunkyPNG::Color('white'))
-    (0..max_y).map do |y|
-      (min_x..max_x).map do |x|
-        point = grid[y][x]
+    (-2..(max_y+2)).map do |y|
+      ((min_x-2)..(max_x+2)).map do |x|
+        point = get_location(x, y)
         if point
           color = nil
           color = case point
@@ -92,7 +95,11 @@ class Fountain
           when '+'
             'blue'
           when '|'
-            'blue'
+            if y < min_y || y > max_y
+              'blue'
+            else
+              'red'
+            end
           else
             require 'pry'
             binding.pry
@@ -104,7 +111,7 @@ class Fountain
       end.join("")
     end.join("\n")
 
-    img[500 - x_offset, 0 - y_offset] = ChunkyPNG::Color('red')
+    # img[500 - x_offset, 0 - y_offset] = ChunkyPNG::Color('red')
     img
   end
 
@@ -206,8 +213,64 @@ class Fountain
     end
   end
 
+  def convert_to_standing
+    to_convert = Set.new
+    grid.each do |y, row|
+      row.each do |x, point|
+        if point == '|' && !to_convert.include?([x,y])
+          check_bounds(x, y, to_convert)
+        end
+      end
+    end
+    to_convert.each do |(x,y)|
+      set_location(x, y, '~')
+    end
+  end
+
+  def check_bounds(x, y, seen)
+    puts "checking bounds of #{x} #{y}"
+    points = [[x,y]]
+    check_x = x
+    loop do
+      check_x = check_x - 1
+      location = get_location(check_x, y)
+      puts "checking left #{check_x} #{y} (#{location})"
+      if location == '#'
+        break
+      elsif location != '|'
+        return false
+      end
+      points << location
+    end
+
+    check_x = x
+    loop do
+      check_x = check_x + 1
+      location = get_location(check_x, y)
+      puts "checking right #{check_x} #{y} (#{location})"
+
+      if location == '#'
+        break
+      elsif location != '|'
+        return false
+      end
+      points << location
+    end
+
+    seen.merge(points)
+  end
+
   def water_reached
-    grid.values.map {|row| row.values.count('|') }.sum
+    (min_y..max_y).map do |y|
+      grid[y].values.count {|value| value == '~' || value == '|'}
+    end.sum
+  end
+
+  def standing_water
+    convert_to_standing
+    (min_y..max_y).map do |y|
+      grid[y].values.count('~')
+    end.sum
   end
 
 end
